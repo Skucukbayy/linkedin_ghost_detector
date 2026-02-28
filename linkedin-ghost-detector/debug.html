@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ghost Detector Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .log { background: #111; color: #0f0; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; max-height: 400px; overflow-y: auto; margin-top: 16px; }
+    h2 { margin-top: 24px; }
+    button { padding: 8px 16px; margin: 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Ghost Detector - Hata Ayiklama</h1>
+  <p>Bu sayfayi LinkedIn Jobs sayfasinda Console'a (F12) asagidaki komutlari yazarak test edin:</p>
+
+  <h2>1. Adim: Eklenti yuklu mu?</h2>
+  <pre style="background:#f3f4f6;padding:12px;border-radius:6px">
+// Console'a yapiştirin:
+console.log("__gd_interval:", window.__gd_interval);
+console.log("__gd_observer:", window.__gd_observer);
+  </pre>
+  <p>Eger ikisi de <code>undefined</code> ise content script hic yuklenmemis demektir.</p>
+
+  <h2>2. Adim: Sayfa DOM'unu kontrol edin</h2>
+  <pre style="background:#f3f4f6;padding:12px;border-radius:6px">
+// Console'a yapiştirin:
+const selectors = [
+  ".job-card-container", "[class*='job-card']", "[data-job-id]",
+  "[data-occludable-job-id]", "li[data-occludable-entity-urn]",
+  ".jobs-search-results__list-item", ".scaffold-layout__list-item",
+  ".jobs-search-results-list__list-item", ".discovery-templates-entity-item",
+  "[class*='jobs-home'] li", "[class*='top-job-picks'] li",
+  ".artdeco-carousel__item"
+];
+selectors.forEach(s => {
+  const count = document.querySelectorAll(s).length;
+  if (count > 0) console.log(`✅ ${s}: ${count} element`);
+});
+// Fallback
+const jobLinks = document.querySelectorAll("li a[href*='/jobs/view']");
+console.log(`Fallback (li with job link): ${jobLinks.length}`);
+// Tum li'ler
+const allLi = document.querySelectorAll("li");
+console.log(`Toplam li: ${allLi.length}`);
+  </pre>
+
+  <h2>3. Adim: Chrome extension hatalari</h2>
+  <p><code>chrome://extensions</code> sayfasinda eklentinin altindaki <strong>"Errors"</strong> / <strong>"Hatalar"</strong> linkine tiklayin ve hatalari buraya yapiştirin.</p>
+
+  <h2>4. Adim: Content script manuel test</h2>
+  <pre style="background:#f3f4f6;padding:12px;border-radius:6px">
+// Console'a yapiştirin - content script'in chrome API'ye erisimi var mi?
+try {
+  chrome.storage.local.get(null, (d) => console.log("Storage:", d));
+  console.log("chrome.storage OK");
+} catch(e) {
+  console.log("chrome.storage HATA:", e.message);
+}
+  </pre>
+</body>
+</html>
