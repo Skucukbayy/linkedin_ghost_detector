@@ -34,7 +34,7 @@ function renderJobs(jobs) {
     }
     html += '<div class="job-item ' + job.riskLevel + '">' +
       '<div class="title">' + (job.title || "Baslik yok") + '</div>' +
-      '<div class="company">' + (job.company || "Sirket belirtilmemis") + '</div>' +
+      '<div class="company">' + (job.company || "Sirket belirtilmemis") + (job.site ? ' <span style="opacity:0.5;font-size:9px">(' + job.site + ')</span>' : '') + '</div>' +
       '<div class="flags">' + flagsHtml + '</div></div>';
   }
   list.innerHTML = html;

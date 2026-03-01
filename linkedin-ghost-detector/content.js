@@ -1,11 +1,11 @@
 var GHOST_STALE_DAYS = 30;
 var GHOST_HIGH_APPLICANT = 200;
-var GHOST_KEYWORDS = ["always hiring","ongoing","continuous","talent pool","pipeline","evergreen","future opportunities"];
+var GHOST_KEYWORDS = ["always hiring","ongoing","continuous","talent pool","pipeline","evergreen","future opportunities","surekli alim","havuz"];
 var ghostFlagged = [];
 var ghostTimer = null;
 
 function ghostLog(msg) {
-  console.log("[GhostDetector] " + msg);
+  console.log("[GhostDetector][" + GHOST_SITE.name + "] " + msg);
 }
 
 function ghostShowStatus(text) {
@@ -15,7 +15,7 @@ function ghostShowStatus(text) {
     el.id = "ghost-detector-status";
     document.body.appendChild(el);
   }
-  el.textContent = text;
+  el.textContent = GHOST_SITE.name + " | " + text;
   clearTimeout(el._hide);
   el._hide = setTimeout(function() { el.style.opacity = "0"; }, 5000);
   el.style.opacity = "0.9";
@@ -27,89 +27,50 @@ function ghostParseDays(text) {
   var m;
   if ((m = s.match(/(\d+)\s*(month|ay|mo)/))) return parseInt(m[1]) * 30;
   if ((m = s.match(/(\d+)\s*(week|hafta|w\b)/))) return parseInt(m[1]) * 7;
-  if ((m = s.match(/(\d+)\s*(day|gün|d\b)/))) return parseInt(m[1]);
+  if ((m = s.match(/(\d+)\s*(day|gün|gun|d\b)/))) return parseInt(m[1]);
   if (s.indexOf("repost") !== -1 || s.indexOf("yeniden") !== -1) return -1;
+
+  var dateMatch = s.match(/(\d{1,2})[\.\/\-](\d{1,2})[\.\/\-](\d{2,4})/);
+  if (dateMatch) {
+    var day = parseInt(dateMatch[1]);
+    var month = parseInt(dateMatch[2]) - 1;
+    var year = parseInt(dateMatch[3]);
+    if (year < 100) year += 2000;
+    var posted = new Date(year, month, day);
+    if (!isNaN(posted.getTime())) {
+      return Math.floor((Date.now() - posted.getTime()) / 86400000);
+    }
+  }
+
   return null;
 }
 
-function ghostFindCards() {
-  var all = document.querySelectorAll("a[href*='jobs']");
-  var cards = [];
-  var seen = new Set();
-
-  for (var i = 0; i < all.length; i++) {
-    var a = all[i];
-    var href = a.getAttribute("href") || "";
-    if (href.indexOf("/jobs/view/") === -1 && href.indexOf("/jobs/collections/") === -1) continue;
-
-    var card = a.closest("li") || a.closest("div[data-job-id]") || a.closest("[class*='card']") || a.parentElement.parentElement;
-    if (!card || seen.has(card)) continue;
-    seen.add(card);
-    cards.push({ el: card, link: a, href: href });
-  }
-
-  if (cards.length === 0) {
-    all = document.querySelectorAll("a");
-    for (var j = 0; j < all.length; j++) {
-      var a2 = all[j];
-      var h = a2.getAttribute("href") || "";
-      if (h.indexOf("/jobs/view/") === -1) continue;
-      var c = a2.closest("li") || a2.parentElement.parentElement;
-      if (!c || seen.has(c)) continue;
-      seen.add(c);
-      cards.push({ el: c, link: a2, href: h });
-    }
-  }
-
-  return cards;
-}
-
 function ghostAnalyze(card) {
+  var info = GHOST_SITE.extractInfo(card);
   var flags = [];
   var score = 0;
-  var text = card.el.textContent || "";
-  var lower = text.toLowerCase();
+  var lower = (info.text || "").toLowerCase();
 
-  var title = "";
-  var strong = card.link.querySelector("strong") || card.link.querySelector("span");
-  if (strong) title = strong.textContent.trim();
-  if (!title) title = card.link.textContent.trim().split("\n")[0].trim();
-
-  var company = "";
-  var spans = card.el.querySelectorAll("span");
-  for (var i = 0; i < spans.length; i++) {
-    var st = spans[i].textContent.trim();
-    if (st.length > 2 && st.length < 60 && st !== title && !st.match(/^\d/) && st.indexOf("Easy Apply") === -1 && st.indexOf("Promoted") === -1) {
-      company = st;
-      break;
-    }
+  var days = ghostParseDays(info.timeText);
+  if (!days && info.datetime) {
+    var d = new Date(info.datetime);
+    if (!isNaN(d.getTime())) days = Math.floor((Date.now() - d.getTime()) / 86400000);
   }
-
-  var timeEl = card.el.querySelector("time");
-  var days = null;
-  if (timeEl) {
-    days = ghostParseDays(timeEl.textContent);
-    if (!days && timeEl.getAttribute("datetime")) {
-      var d = new Date(timeEl.getAttribute("datetime"));
-      if (!isNaN(d.getTime())) days = Math.floor((Date.now() - d.getTime()) / 86400000);
-    }
-  }
-  if (!days) {
-    var tm = text.match(/(\d+\s*(gün|day|hafta|week|ay|month|mo|d|w)\w*\s*(önce|ago)?)/i);
+  if (days === null) {
+    var tm = (info.text || "").match(/(\d+\s*(gün|gun|day|hafta|week|ay|month|mo|d|w)\w*\s*(önce|once|ago)?)/i);
     if (tm) days = ghostParseDays(tm[0]);
   }
-  if (days === null && (lower.indexOf("repost") !== -1 || lower.indexOf("yeniden") !== -1)) days = -1;
 
   if (days !== null && days > GHOST_STALE_DAYS) {
     flags.push(days + " gundur yayinda (>" + GHOST_STALE_DAYS + " gun)");
     score += 30;
   }
-  if (days === -1 || lower.indexOf("repost") !== -1 || lower.indexOf("yeniden yayın") !== -1) {
+  if (days === -1 || lower.indexOf("repost") !== -1 || lower.indexOf("yeniden yayın") !== -1 || lower.indexOf("yeniden yayin") !== -1) {
     flags.push("Yeniden yayinlanmis ilan");
     score += 20;
   }
 
-  var appM = lower.match(/(\d[\d,\.]*)\+?\s*(basvur|applicant|aday|people clicked|applied)/i);
+  var appM = lower.match(/(\d[\d,\.]*)\+?\s*(basvur|applicant|aday|people clicked|applied|kisi)/i);
   if (appM) {
     var n = parseInt(appM[1].replace(/[,\.]/g, ""));
     if (n >= GHOST_HIGH_APPLICANT) { flags.push(n + "+ basvuru (hala acik)"); score += 15; }
@@ -119,15 +80,19 @@ function ghostAnalyze(card) {
     if (lower.indexOf(GHOST_KEYWORDS[k]) !== -1) { flags.push('"' + GHOST_KEYWORDS[k] + '" ifadesi'); score += 10; }
   }
 
-  if (lower.indexOf("promoted") !== -1 || lower.indexOf("sponsorlu") !== -1) { flags.push("Sponsorlu ilan"); score += 5; }
-  if (!company || company.length < 2) { flags.push("Sirket bilgisi eksik"); score += 15; }
+  if (lower.indexOf("promoted") !== -1 || lower.indexOf("sponsorlu") !== -1 || lower.indexOf("öne çıkan") !== -1 || lower.indexOf("one cikan") !== -1) {
+    flags.push("Sponsorlu ilan");
+    score += 5;
+  }
 
-  if ((lower.indexOf("easy apply") !== -1 || lower.indexOf("kolay basvur") !== -1) && days !== null && days > GHOST_STALE_DAYS) {
-    flags.push("Easy Apply + uzun suredir acik");
+  if (!info.company || info.company.length < 2) { flags.push("Sirket bilgisi eksik"); score += 15; }
+
+  if ((lower.indexOf("easy apply") !== -1 || lower.indexOf("kolay basvur") !== -1 || lower.indexOf("hemen basvur") !== -1) && days !== null && days > GHOST_STALE_DAYS) {
+    flags.push("Kolay Basvuru + uzun suredir acik");
     score += 10;
   }
 
-  return { title: title, company: company, flags: flags, score: score };
+  return { title: info.title, company: info.company, flags: flags, score: score };
 }
 
 function ghostAddBadge(card, result) {
@@ -142,10 +107,10 @@ function ghostAddBadge(card, result) {
 }
 
 function ghostScan() {
-  if (location.href.indexOf("/jobs") === -1) return;
+  if (location.href.indexOf(GHOST_SITE.jobPagePattern) === -1) return;
 
-  var cards = ghostFindCards();
-  ghostLog("Bulunan kart: " + cards.length + " | URL: " + location.href);
+  var cards = GHOST_SITE.findCards();
+  ghostLog("Bulunan kart: " + cards.length);
 
   ghostFlagged = [];
   for (var i = 0; i < cards.length; i++) {
@@ -157,16 +122,17 @@ function ghostScan() {
         company: r.company,
         flags: r.flags,
         riskScore: r.score,
-        riskLevel: r.score >= 40 ? "high-risk" : r.score >= 20 ? "medium-risk" : "low-risk"
+        riskLevel: r.score >= 40 ? "high-risk" : r.score >= 20 ? "medium-risk" : "low-risk",
+        site: GHOST_SITE.name
       });
     }
   }
 
-  ghostShowStatus("Tarama: " + cards.length + " ilan, " + ghostFlagged.length + " supheli");
+  ghostShowStatus(cards.length + " ilan tarandı, " + ghostFlagged.length + " supheli");
   ghostLog("Supheli: " + ghostFlagged.length);
 
   try {
-    chrome.storage.local.set({ flaggedJobs: ghostFlagged });
+    chrome.storage.local.set({ flaggedJobs: ghostFlagged, lastSite: GHOST_SITE.name });
   } catch(e) {
     ghostLog("Storage hatasi - durduruluyor");
     ghostStop();

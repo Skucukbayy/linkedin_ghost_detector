@@ -1,14 +1,30 @@
 {
   "manifest_version": 3,
-  "name": "LinkedIn Ghost Job Detector",
-  "version": "2.0.0",
-  "description": "LinkedIn sahte/hayalet ilan tespit eklentisi",
+  "name": "Ghost Job Detector",
+  "version": "3.0.0",
+  "description": "LinkedIn, Kariyer.net ve Yenibiris.com sahte/hayalet ilan tespit eklentisi",
   "permissions": ["storage", "tabs"],
-  "host_permissions": ["https://www.linkedin.com/*"],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "https://www.kariyer.net/*",
+    "https://www.yenibiris.com/*"
+  ],
   "content_scripts": [
     {
       "matches": ["https://www.linkedin.com/*"],
-      "js": ["content.js"],
+      "js": ["sites/linkedin.js", "content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.kariyer.net/*"],
+      "js": ["sites/kariyer.js", "content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.yenibiris.com/*"],
+      "js": ["sites/yenibiris.js", "content.js"],
       "css": ["content.css"],
       "run_at": "document_idle"
     }
