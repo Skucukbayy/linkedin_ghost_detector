@@ -1,0 +1,42 @@
+Ghost Job Detector - Sahte Is Ilani Tespit Eklentisi
+
+LinkedIn, Kariyer.net ve Yenibiris.com uzerindeki sahte ve hayalet is ilanlarini otomatik olarak tespit eden Chrome eklentisi.
+
+NASIL CALISIR?
+Eklenti, is ilan sayfalarini otomatik olarak tarar ve asagidaki kriterlere gore supheli ilanlari isaretler:
+
+- 30 gundan fazla suredir yayinda olan ilanlar
+- Yeniden yayinlanmis (repost) ilanlar
+- 200+ basvuru yapilmis ama hala acik olan ilanlar
+- Sirket bilgisi eksik veya belirsiz ilanlar
+- Sponsorlu / Promoted ilanlar
+- "Always hiring", "talent pool" gibi surekli alim ifadeleri iceren ilanlar
+- Konum veya detay bilgisi eksik ilanlar
+- Easy Apply + uzun suredir acik olan ilanlar
+
+RISK PUANLAMA SISTEMI
+Her ilan icin bir risk skoru hesaplanir:
+- Yuksek Risk (40+): Buyuk ihtimalle sahte veya hayalet ilan
+- Orta Risk (20-39): Dikkatli olunmasi gereken ilan
+- Dusuk Risk (0-19): Kucuk suphe isaretleri olan ilan
+
+OZELLIKLER
+- LinkedIn, Kariyer.net ve Yenibiris.com destegi
+- Otomatik periyodik tarama (15 saniyede bir)
+- Sayfa uzerinde gorunur risk etiketleri
+- Popup panelde detayli istatistikler ve supheli ilan listesi
+- Hafif ve hizli - tarayici performansini etkilemez
+- Tamamen yerel calisir - veriniz hicbir yere gonderilmez
+
+NEDEN GHOST JOB DETECTOR?
+Arastirmalara gore is ilanlarinin onemli bir kismi "hayalet ilan" olarak adlandirilir. Bu ilanlar gercekte doldurulmasi planlanmayan, sirketlerin cesitli nedenlerle (yetenek havuzu olusturma, piyasa arastirmasi, sirket imaji vb.) yayinladigi ilanlardir. Ghost Job Detector, zaman kaybetmemeniz icin bu ilanlari tespit eder.
+
+GIZLILIK
+Bu eklenti hicbir kisisel veriyi toplamaz, saklamaz veya iletmez. Tum islemler tamamen tarayicinizda yerel olarak gerceklesir.
+
+DESTEKLENEN SITELER
+- LinkedIn (linkedin.com/jobs)
+- Kariyer.net (kariyer.net/is-ilanlari)
+- Yenibiris.com (yenibiris.com/is-ilanlari)
+
+Sorulariniz veya onerileriniz icin GitHub uzerinden iletisime gecebilirsiniz.

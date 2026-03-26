@@ -1,0 +1,42 @@
+Ghost Job Detector - Fake Job Listing Detection Extension
+
+Automatically detect fake and ghost job listings on LinkedIn, Kariyer.net, and Yenibiris.com.
+
+HOW IT WORKS
+The extension automatically scans job listing pages and flags suspicious postings based on the following criteria:
+
+- Listings active for more than 30 days
+- Reposted job listings
+- 200+ applicants but still open
+- Missing or vague company information
+- Sponsored / Promoted listings
+- Phrases like "always hiring", "talent pool" indicating evergreen postings
+- Missing location or detail information
+- Easy Apply + long-active combination
+
+RISK SCORING SYSTEM
+A risk score is calculated for each listing:
+- High Risk (40+): Most likely a fake or ghost listing
+- Medium Risk (20-39): Listing that requires caution
+- Low Risk (0-19): Minor suspicion indicators
+
+FEATURES
+- Supports LinkedIn, Kariyer.net, and Yenibiris.com
+- Automatic periodic scanning (every 15 seconds)
+- Visible risk badges directly on the page
+- Detailed statistics and flagged job list in popup panel
+- Lightweight and fast - no impact on browser performance
+- Runs entirely locally - your data is never sent anywhere
+
+WHY GHOST JOB DETECTOR?
+Research shows that a significant portion of job listings are "ghost jobs" - postings that companies never intend to fill, published for various reasons (building talent pools, market research, company image, etc.). Ghost Job Detector saves your time by identifying these listings.
+
+PRIVACY
+This extension does not collect, store, or transmit any personal data. All processing happens entirely locally in your browser.
+
+SUPPORTED SITES
+- LinkedIn (linkedin.com/jobs)
+- Kariyer.net (kariyer.net/is-ilanlari)
+- Yenibiris.com (yenibiris.com/is-ilanlari)
+
+For questions or suggestions, please reach out via GitHub.
